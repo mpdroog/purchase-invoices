@@ -1,0 +1,5 @@
+.DS_Store
+composer.phar
+digitalocean/_token.txt
+transip/_config.json
+xsnews/_config.json

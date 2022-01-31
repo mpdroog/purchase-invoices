@@ -1,0 +1,14 @@
+{
+    "require": {
+        "transip/transip-api-php": "^6.14",
+    	"mpdroog/core": "master"
+    },
+    "minimum-stability": "dev",
+
+	"repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mpdroog/core"
+        }
+    ]
+}

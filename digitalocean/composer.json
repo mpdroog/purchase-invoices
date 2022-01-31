@@ -1,0 +1,16 @@
+{
+    "require": {
+        "toin0u/digitalocean-v2": "^4.5",
+        "guzzlehttp/guzzle": "^7.4",
+        "http-interop/http-factory-guzzle": "^1.2",
+        "mpdroog/core": "master"
+    },
+    "minimum-stability": "dev",
+
+        "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mpdroog/core"
+        }
+    ]
+}
