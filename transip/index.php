@@ -4,6 +4,7 @@
  * for quicker billing.
  * CLI: php index.php -y=2021 -q=4
  */
+define("HIDE_READONLY", true);
 use Transip\Api\Library\TransipAPI;
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/vendor/mpdroog/core/init-cli.php';
@@ -35,7 +36,7 @@ $dateRange = [
 ];
 if (VERBOSE) var_dump($dateRange);
 
-$out = __DIR__ . "/" . $year . "Q" . $quarter;
+$out = $year . "Q" . $quarter;
 if (! file_exists($out) && ! mkdir($out)) {
     echo "mkdir($out) failed?\n";
     exit(1);
