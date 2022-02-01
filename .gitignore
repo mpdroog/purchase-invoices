@@ -4,3 +4,4 @@ digitalocean/_token.txt
 transip/_config.json
 xsnews/_config.json
 mollie/_bearer.txt
+cacert.pem

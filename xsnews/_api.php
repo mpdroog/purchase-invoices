@@ -57,7 +57,7 @@ class API {
 
     $opt &= curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
     $opt &= curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-    //$opt &= curl_setopt($ch, CURLOPT_CAINFO, "/data01/web/xsnews-action/lib/cacert.pem"); // TODO: Something cleaner?
+    $opt &= curl_setopt($ch, CURLOPT_CAINFO, "cacert.pem");
 
     if ($opt !== 1) {
         user_error("one or more curl_setopt failed?");
