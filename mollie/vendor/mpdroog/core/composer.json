@@ -1,0 +1,24 @@
+{
+    "name": "mpdroog/core",
+    "description": "µLib for writing HTTP/CLI code.",
+    "homepage": "http://rootdev.nl/",
+    "license": ["MIT"],
+    "require": {
+        "php": ">=5.5.0",
+        "ext-curl": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-mbstring": "*",
+
+        "pda/pheanstalk": "^3.0",
+        "lifo/ip": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "core\\": "./"
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16"
+    }
+}
