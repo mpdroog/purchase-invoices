@@ -46,7 +46,7 @@ if (! file_exists($out) && ! mkdir($out)) {
 API::init(json_decode(file_get_contents(__DIR__ . "/_config.json"), true));
 $invoices = API::call("GET", "/finance/invoices", []);
 if (DEBUG) var_dump($invoices);
-if ($invoices["res"] !== 200) {
+if ($invoices["http"] !== 200) {
     echo "ERR: API didn't gave valid response.\n";
     exit(1);
 }

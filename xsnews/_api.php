@@ -59,15 +59,19 @@ class API {
     $opt &= curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
     $opt &= curl_setopt($ch, CURLOPT_CAINFO, "cacert.pem");
 
+    if (count($args) > 0) {
+      $opt &= curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($args));
+    }
     if ($opt !== 1) {
         user_error("one or more curl_setopt failed?");
     }
 
-    if (count($args) > 0) {
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($args));
-    }
-
     $res = curl_exec($ch);
+    if ($res === false) {
+      $err = curl_error($ch);
+      curl_close($ch);
+      user_error("curl_exec e=" . $err);
+    }
     $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     return [
