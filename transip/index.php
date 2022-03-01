@@ -60,6 +60,7 @@ try {
     echo $e->getMessage() . "\n";
     exit(1);
 }
+if (DEBUG) var_dump($res);
 
 $sum = file_exists(sprintf("%s/sum.json", $out)) ? json_decode(file_get_contents(sprintf("%s/sum.json", $out)), true) : [];
 $sum["transip"] = $sum["transip"] ?? [];

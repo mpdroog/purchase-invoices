@@ -92,7 +92,7 @@ foreach ($invoices->billing_history as $invoice) {
         echo sprintf("Invoice %s amount=%s date=%s\n", $invoice->invoice_id, $invoice->amount, $invoice->date);
         $bin = $billing->getPDF($client, $invoice->invoice_uuid);
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice->invoice_id), $bin);
-        $sum["digitalocean"] = [
+        $sum["digitalocean"][] = [
             "id" => $invoice->invoice_id,
             "paydate" => $invoice->date,
             "sum" => $invoice->amount,

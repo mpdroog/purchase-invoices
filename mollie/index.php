@@ -57,7 +57,7 @@ foreach ($res["_embedded"]["invoices"] as $invoice) {
         $bin = download($link);
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice["reference"]), $bin);
         $sum["mollie"][] = [
-            "id" => $invoice->getInvoiceNumber(),
+            "id" => $invoice["reference"],
             "paydate" => $invoice["issuedAt"],
             "sum" => $invoice["grossAmount"]["value"],
             "tax" => $invoice["vatAmount"]["value"],

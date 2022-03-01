@@ -59,7 +59,7 @@ foreach ($invoices["json"] as $invoice) {
         echo sprintf("Add invoice=%s date=%s total=%s\n", $invoice["ID"], date("Y-m-d", $invoice["Date"]), $invoice["TotalAmount"]["Formatted"]);
         $bin = API::call("GET", sprintf("/finance/invoice/%s/pdf", $invoice["ID"]));
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice["ID"]), $bin["res"]);
-        $sum["xsnews"] = [
+        $sum["xsnews"][] = [
             "id" => $invoice["ID"],
             "paydate" => $invoice["Date"],
             "sum" => $invoice["TotalAmount"]["Decimal"],
