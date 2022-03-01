@@ -2,23 +2,47 @@
 # Bash strict mode
 set -euo pipefail
 IFS=$'\n\t'
-set -x
+
+year=""
+quarter=""
+args=""
 
 # CLI-args
-while getopts y:q: flag
-do
-    case "${flag}" in
-        y) year=${OPTARG};;
-        q) quarter=${OPTARG};;
-    esac
+optstring=":hy:q:v"
+while getopts ${optstring} arg; do
+  case ${arg} in
+    v) args="-v"; set -x ;;
+    y) year=$OPTARG ;;
+    q) quarter=$OPTARG ;;
+    h)
+      echo "./$(basename $0) -y=YYYY -q=N"
+      echo " -y = Year"
+      echo " -q = Quarter number"
+      echo " -v = Verbose"
+      exit 0
+      ;;
+    :)
+      echo "$0: Must supply an argument to -$OPTARG." >&2
+      exit 1
+      ;;
+    ?)
+      echo "Invalid option: -${OPTARG}."
+      exit 2
+      ;;
+  esac
 done
 
+if [ -z "$year" ] || [ -z "$quarter" ]; then
+    echo 'Missing -y or -q' >&2
+    exit 1
+fi
+echo "year=$year quarter=$quarter"
+
 # cacert.pem
-date=$(date '+%Y-%m-%d')
-wget -q -O cacert.pem "https://curl.se/ca/cacert-$date.pem"
+wget -nv -O cacert.pem "https://curl.se/ca/cacert.pem"
 
 # Collect all invoices
-php transip/index.php -y=$year -q=$quarter
-php digitalocean/index.php -y=$year -q=$quarter
-php xsnews/index.php -y=$year -q=$quarter
-php mollie/index.php -y=$year -q=$quarter
+php transip/index.php -y=$year -q=$quarter $args
+php digitalocean/index.php -y=$year -q=$quarter $args
+php xsnews/index.php -y=$year -q=$quarter $args
+php mollie/index.php -y=$year -q=$quarter $args
