@@ -31,7 +31,7 @@ if (! isset($quarters[$quarter])) {
 }
 
 $dateRange = [
-    sprintf("%d-%d-01", $year, $quarters[$quarter][0]),
+    sprintf("%d-%02d-01", $year, $quarters[$quarter][0]),
     date("Y-m-d", strtotime("+1 month", strtotime(sprintf("%d-%d-01", $year, $quarters[$quarter][1])))-1),
 ];
 if (VERBOSE) var_dump($dateRange);
@@ -43,6 +43,10 @@ if (! file_exists($out) && ! mkdir($out)) {
 }
 
 $res = mollie("invoices?year=$year", []);
+
+$sum = file_exists(sprintf("%s/sum.json", $out)) ? json_decode(file_get_contents(sprintf("%s/sum.json", $out)), true) : [];
+$sum["mollie"] = $sum["mollie"] ?? [];
+
 foreach ($res["_embedded"]["invoices"] as $invoice) {
     if ($invoice["resource"] !== "invoice") continue;
     if ($invoice["issuedAt"] >= $dateRange[0] && $invoice["issuedAt"] <= $dateRange[1]) {
@@ -52,5 +56,13 @@ foreach ($res["_embedded"]["invoices"] as $invoice) {
         $link = $invoice["_links"]["pdf"]["href"];
         $bin = download($link);
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice["reference"]), $bin);
+        $sum["mollie"][] = [
+            "id" => $invoice->getInvoiceNumber(),
+            "paydate" => $invoice["issuedAt"],
+            "sum" => $invoice["grossAmount"]["value"],
+            "tax" => $invoice["vatAmount"]["value"],
+        ];
     }
 }
+
+file_put_contents(sprintf("%s/sum.json", $out), json_encode($sum));

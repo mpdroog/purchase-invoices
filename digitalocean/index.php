@@ -32,7 +32,7 @@ if (! isset($quarters[$quarter])) {
 }
 
 $dateRange = [
-    sprintf("%d-%d-01", $year, $quarters[$quarter][0]),
+    sprintf("%d-%02d-01", $year, $quarters[$quarter][0]),
     date("Y-m-d", strtotime("+1 month", strtotime(sprintf("%d-%d-01", $year, $quarters[$quarter][1])))-1),
 ];
 if (VERBOSE) var_dump($dateRange);
@@ -80,6 +80,9 @@ $billing = new BillingDO($client);
 $invoices = $billing->getHistoricalInvoices();
 if (DEBUG) var_dump($invoices);
 
+$sum = file_exists(sprintf("%s/sum.json", $out)) ? json_decode(file_get_contents(sprintf("%s/sum.json", $out)), true) : [];
+$sum["digitalocean"] = $sum["digitalocean"] ?? [];
+
 foreach ($invoices->billing_history as $invoice) {
     if (DEBUG) var_dump($invoice);
     if (strtolower($invoice->type) !== "invoice") continue;
@@ -89,5 +92,13 @@ foreach ($invoices->billing_history as $invoice) {
         echo sprintf("Invoice %s amount=%s date=%s\n", $invoice->invoice_id, $invoice->amount, $invoice->date);
         $bin = $billing->getPDF($client, $invoice->invoice_uuid);
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice->invoice_id), $bin);
+        $sum["digitalocean"] = [
+            "id" => $invoice->invoice_id,
+            "paydate" => $invoice->date,
+            "sum" => $invoice->amount,
+            "tax" => null, /* unknown? */
+        ];
     }
 }
+
+file_put_contents(sprintf("%s/sum.json", $out), json_encode($sum));

@@ -32,7 +32,7 @@ if (! isset($quarters[$quarter])) {
 $year = intval($year);
 
 $tsRange = [
-    strtotime(sprintf("%d-%d-01", $year, $quarters[$quarter][0])),
+    strtotime(sprintf("%d-%02d-01", $year, $quarters[$quarter][0])),
     strtotime("+1 month", strtotime(sprintf("%d-%d-01", $year, $quarters[$quarter][1])))-1,
 ];
 if (VERBOSE) var_dump($tsRange);
@@ -46,12 +46,26 @@ if (! file_exists($out) && ! mkdir($out)) {
 API::init(json_decode(file_get_contents(__DIR__ . "/_config.json"), true));
 $invoices = API::call("GET", "/finance/invoices", []);
 if (DEBUG) var_dump($invoices);
+if ($invoices["res"] !== 200) {
+    echo "ERR: API didn't gave valid response.\n";
+    exit(1);
+}
+
+$sum = file_exists(sprintf("%s/sum.json", $out)) ? json_decode(file_get_contents(sprintf("%s/sum.json", $out)), true) : [];
+$sum["xsnews"] = $sum["xsnews"] ?? [];
 
 foreach ($invoices["json"] as $invoice) {
     if ($invoice["Date"] >= $tsRange[0] && $invoice["Date"] <= $tsRange[1]) {
         echo sprintf("Add invoice=%s date=%s total=%s\n", $invoice["ID"], date("Y-m-d", $invoice["Date"]), $invoice["TotalAmount"]["Formatted"]);
         $bin = API::call("GET", sprintf("/finance/invoice/%s/pdf", $invoice["ID"]));
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice["ID"]), $bin["res"]);
+        $sum["xsnews"] = [
+            "id" => $invoice["ID"],
+            "paydate" => $invoice["Date"],
+            "sum" => $invoice["TotalAmount"]["Decimal"],
+            "tax" => $invoice["TotalVAT"]["Decimal"],
+        ];
     }
 }
 
+file_put_contents(sprintf("%s/sum.json", $out), json_encode($sum));

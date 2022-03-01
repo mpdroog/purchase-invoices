@@ -31,7 +31,7 @@ if (! isset($quarters[$quarter])) {
 }
 
 $dateRange = [
-    sprintf("%d-%d-01", $year, $quarters[$quarter][0]),
+    sprintf("%d-%02d-01", $year, $quarters[$quarter][0]),
     date("Y-m-d", strtotime("+1 month", strtotime(sprintf("%d-%d-01", $year, $quarters[$quarter][1])))-1),
 ];
 if (VERBOSE) var_dump($dateRange);
@@ -61,6 +61,9 @@ try {
     exit(1);
 }
 
+$sum = file_exists(sprintf("%s/sum.json", $out)) ? json_decode(file_get_contents(sprintf("%s/sum.json", $out)), true) : [];
+$sum["transip"] = $sum["transip"] ?? [];
+
 foreach ($res as $invoice) {
     // https://github.com/transip/transip-api-php/blob/66a7524cc280e75173696109d382e19de6f3f22e/src/Entity/Invoice/InvoiceItem.php
     if ($invoice->getPayDate() >= $dateRange[0] && $invoice->getPayDate() <= $dateRange[1]) {
@@ -69,6 +72,14 @@ foreach ($res as $invoice) {
         echo sprintf("Add=%s total=%s tax=%s date=%s\n", $invoice->getInvoiceNumber(), $total, $tax, $invoice->getPayDate());
 
         $bin = $api->invoicePdf()->getByInvoiceNumber($invoice->getInvoiceNumber())->getPdf();
-        file_put_contents(sprintf("%s/%s.pdf", $out,  $invoice->getInvoiceNumber()), $bin);
+        file_put_contents(sprintf("%s/%s.pdf", $out, $invoice->getInvoiceNumber()), $bin);
+        $sum["transip"][] = [
+            "id" => $invoice->getInvoiceNumber(),
+            "paydate" => $invoice->getPayDate(),
+            "sum" => $total,
+            "tax" => $tax,
+        ];
     }
 }
+
+file_put_contents(sprintf("%s/sum.json", $out), json_encode($sum));
