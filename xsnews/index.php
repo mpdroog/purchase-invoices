@@ -63,7 +63,7 @@ foreach ($invoices["json"] as $invoice) {
             "id" => $invoice["ID"],
             "paydate" => $invoice["Date"],
             "sum" => $invoice["TotalAmount"]["Decimal"],
-            "tax" => $invoice["TotalVAT"]["Decimal"],
+            "tax" => $invoice["TotalVAT"]["Decimal"] ?? null,
         ];
     }
 }
