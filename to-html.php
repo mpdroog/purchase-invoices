@@ -60,6 +60,7 @@ $taxRounded = ceil($tax);
 $html .= "</tbody>";
 $html .= "<tfooter><tr><td colspan='2'>Total</td><td>$sum</td><td>$tax</td></tr>";
 $html .= "<tr class='table-primary'><td colspan='2'>Total(rounded)</td><td>$sumRounded</td><td>$taxRounded</td></tr></tfooter>";
-$html .= "</table></div></body></html>";
+$html .= "</table>";
+$html .= "<p>5b. Voorbelasting = $taxRounded</p></div></body></html>";
 file_put_contents(str_replace(".json", ".html", $p), $html);
 
