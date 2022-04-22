@@ -43,7 +43,7 @@ if (DEBUG) var_dump($j);
 $html = '<html><head><title>Voorbelasting</title><style>.quote { padding: 1rem; border: 1px solid #dee2e6; }</style><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"></head><body><div class="container">';
 $html .= sprintf("<h1 class='pt-4'>💸 Voorbelasting (Pre-tax) %s/%s</h1>", $year, $quarter);
 $html .= '<figure class="py-4 quote"><blockquote class="blockquote"><p>Voorbelasting is de btw die ondernemers aan andere ondernemers in rekening brengen voor de levering van goederen of diensten. De in rekening gebrachte btw kan door de ondernemer die de aankoop heeft gedaan worden afgetrokken als voorbelasting tijdens de btw-aangifte.</p></blockquote><figcaption class="blockquote-footer"><a href="https://www.finler.nl/kennis/voorbelasting/">Finler</a></figcaption></figure>';
-$html .= "<table class='table'><thead><tr><th>ID</th><th>Sum</th><th>Tax</th></tr></thead><tbody>";
+$html .= "<table class='table'><thead><tr><th>Supplier</th><th>ID</th><th>Sum (incl.TAX)</th><th>Tax</th></tr></thead><tbody>";
 
 $sum = "0.00";
 $tax = "0.00";
@@ -51,15 +51,15 @@ foreach ($j as $entity => $invoices) {
     foreach ($invoices as $invoice) {
         $sum = bcadd($sum, $invoice["sum"], 2);
         if (isset($invoice["tax"])) $tax = bcadd($tax, $invoice["tax"], 2);
-        $html .= sprintf("<tr><td>%s</td><td>%s</td><td>%s</td></tr>", $invoice["id"], $invoice["sum"], $invoice["tax"]);
+        $html .= sprintf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $entity, $invoice["id"], $invoice["sum"], $invoice["tax"]);
     }
 }
 $sumRounded = ceil($sum);
 $taxRounded = ceil($tax);
 
 $html .= "</tbody>";
-$html .= "<tfooter><tr><td>Total</td><td>$sum</td><td>$tax</td></tr>";
-$html .= "<tr class='table-primary'><td>Total(rounded)</td><td>$sumRounded</td><td>$taxRounded</td></tr></tfooter>";
+$html .= "<tfooter><tr><td colspan='2'>Total</td><td>$sum</td><td>$tax</td></tr>";
+$html .= "<tr class='table-primary'><td colspan='2'>Total(rounded)</td><td>$sumRounded</td><td>$taxRounded</td></tr></tfooter>";
 $html .= "</table></div></body></html>";
 file_put_contents(str_replace(".json", ".html", $p), $html);
 

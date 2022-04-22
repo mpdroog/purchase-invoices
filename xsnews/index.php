@@ -56,14 +56,19 @@ $sum["xsnews"] = $sum["xsnews"] ?? [];
 
 foreach ($invoices["json"] as $invoice) {
     if ($invoice["Date"] >= $tsRange[0] && $invoice["Date"] <= $tsRange[1]) {
-        echo sprintf("Add invoice=%s date=%s total=%s\n", $invoice["ID"], date("Y-m-d", $invoice["Date"]), $invoice["TotalAmount"]["Formatted"]);
+        $sum_notax = $invoice["TotalAmount"]["Decimal"];
+        $sumtxt = round(bcmul($sum_notax, "1.21", 4), 2); // TODO: Risky here..
+        $tax = bcsub($sumtxt, $sum_notax, 2);
+
+        echo sprintf("Add invoice=%s date=%s total=%s tax=%s\n", $invoice["ID"], date("Y-m-d", $invoice["Date"]), $sumtxt, $tax);
         $bin = API::call("GET", sprintf("/finance/invoice/%s/pdf", $invoice["ID"]));
         file_put_contents(sprintf("%s/%s.pdf", $out, $invoice["ID"]), $bin["res"]);
+
         $sum["xsnews"][] = [
             "id" => $invoice["ID"],
             "paydate" => $invoice["Date"],
-            "sum" => $invoice["TotalAmount"]["Decimal"],
-            "tax" => $invoice["TotalVAT"]["Decimal"] ?? null,
+            "sum" => $sumtxt,
+            "tax" => $tax,
         ];
     }
 }
