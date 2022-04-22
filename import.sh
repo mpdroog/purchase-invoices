@@ -47,3 +47,4 @@ php transip/index.php -y=$year -q=$quarter $args
 php digitalocean/index.php -y=$year -q=$quarter $args
 php xsnews/index.php -y=$year -q=$quarter $args
 php mollie/index.php -y=$year -q=$quarter $args
+php to-html.php -y=$year -q=$quarter $args
