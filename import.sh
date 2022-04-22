@@ -34,6 +34,7 @@ done
 
 if [ -z "$year" ] || [ -z "$quarter" ]; then
     echo 'Missing -y or -q' >&2
+    echo '  example: ./import.sh -y 2022 -q 1' >&2
     exit 1
 fi
 echo "year=$year quarter=$quarter"
