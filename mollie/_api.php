@@ -22,14 +22,17 @@ function mollie($endpoint, array $post) {
   $opt &= curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
   $opt &= curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
   $opt &= curl_setopt($curl, CURLOPT_CAINFO, "cacert.pem");
+  // hackfix to solve "HTTP/2 stream 0 was not closed cleanly: PROTOCOL_ERROR"
+  $opt &= curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
   if ($opt !== 1) user_error("curl_setopt fail");
 
   $res = curl_exec($curl);
   $http = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   if ($http < 200 || $http > 299) {
+    $err = curl_error($curl);
     curl_close($curl);
-    user_error(sprintf("HTTP(%s) => (%d) %s", $url, $http, $res));
+    user_error(sprintf("HTTP(%s) => (%d) %s-%s", $url, $http, $err, $res));
   }
   curl_close($curl);
   $json = json_decode($res, true);
