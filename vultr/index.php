@@ -54,7 +54,22 @@ foreach ($invoices->billing_invoices as $invoice) {
 
     $date = date("Y-m-d", strtotime($invoice->date));
     if ($date >= $dateRange[0] && $date <= $dateRange[1]) {
-        echo sprintf("Invoice %s amount=%s date=%s\n", $invoice->id, $invoice->amount, $invoice->date);
+        $balance = $invoice->balance;
+        $lines = vultr(sprintf("billing/invoices/%s/items", $invoice->id), []);
+
+        $linesum = "0.00";
+        foreach ($lines->invoice_items as $item) {
+            $v = round(bcmul($item->units, $item->unit_price, 5), 2, PHP_ROUND_HALF_UP);
+            $linesum = bcadd($linesum, $v, 5);
+        }
+        $tax = "0.00";
+        if ($balance < 0) {
+            // Only allow half for some weird reason
+            $linesum = bcdiv($linesum, 2, 5);
+        }
+        $tax = round(bcmul($linesum, "0.21", 5), 2, PHP_ROUND_HALF_UP);
+
+        echo sprintf("Invoice %s amount=%s tax=%s date=%s\n", $invoice->id, $invoice->amount, $tax, $invoice->date);
         // https://my.vultr.com/billing/invoice/20969207
         // $bin = $billing->getPDF($client, $invoice->invoice_uuid);
         // file_put_contents(sprintf("%s/%s.pdf", $out, $invoice->id), $bin);
@@ -62,7 +77,7 @@ foreach ($invoices->billing_invoices as $invoice) {
             "id" => $invoice->id,
             "paydate" => $invoice->date,
             "sum" => $invoice->amount,
-            "tax" => null, /* unknown? */
+            "tax" => $tax, /* trying but can be wrong.. */
         ];
     }
 }
